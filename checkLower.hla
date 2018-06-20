@@ -1,0 +1,91 @@
+program StringProgram;
+#include( "stdlib.hhf" ); 
+#include( "cs17Final.hla" );
+static 
+	stringData : dword;
+
+procedure isAllLowerCase( stringData : dword ); @nodisplay; @noframe;
+static
+	dReturnAddress : dword;
+	resultOfLower: int8 := 1; 
+	tempEDX: dword := 0;
+	tempECX: dword := 0;
+	tempEBX: dword := 0;
+begin isAllLowerCase;
+
+mov(EBX, tempEBX);
+mov(ECX, tempECX);
+mov(EDX, tempEDX);
+pop( dReturnAddress );
+pop(EDX);
+push( dReturnAddress ); 
+push(tempEDX);
+push(tempECX);
+push(tempEBX);
+
+mov(#0, CH);
+mov(#97, CL);
+mov(#122, BL);
+
+WhileLp:
+WhileLpTermination:
+	cmp([EDX], CH);
+	je WhileLpDone;
+WhileLpBody:
+	cmp([EDX], CL);
+	jl notLower;
+	cmp([EDX], BL);
+	jg notLower;
+	inc(EDX);
+	jmp WhileLp;
+	
+notLower:
+	mov(0, resultOfLower);
+	jmp WhileLpDone;
+	
+WhileLpDone:
+
+mov(resultOfLower, AL);
+pop(EBX);
+pop(ECX);
+pop(EDX);
+ret();
+end isAllLowerCase;
+
+begin StringProgram;
+
+stdout.put( "Please enter a string to process", nl );
+// this code prompts for a length and allocates a string that size
+mov( @size( int8 ), AL );
+mov( 80, BL );
+inc( BL );
+mul( BL );
+mov( 0, EBX );
+mov( AX, BX );
+malloc( EBX );
+mov( EAX, stringData );
+
+// let's try reading a value into the string
+mov( stringData, EBX );
+push( EBX );
+mov( 80, CX );
+push( CX );
+call gets;
+
+// print the string
+stdout.put( "----> here is the string you entered: " );
+mov( stringData, EBX );
+push( EBX );
+call puts;
+stdout.newln();
+
+// initialize EAX before calling the function.
+
+mov( 0, EAX );
+mov(&stringData, EBX);
+push(EBX);
+call isAllLowerCase;
+stdout.put( "result=" );
+stdout.puti32(EAX);
+stdout.newln();
+end StringProgram;
